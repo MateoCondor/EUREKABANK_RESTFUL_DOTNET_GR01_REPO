@@ -13,13 +13,13 @@ public class Transaction
     public TransactionType Type { get; set; }
 
     [JsonPropertyName("transferType")]
-    public TransferType TransferType { get; set; }
+    public TransferType? TransferType { get; set; }
 
     [JsonPropertyName("amount")]
     public decimal Amount { get; set; }
 
     [JsonPropertyName("fee")]
-    public decimal Fee { get; set; }
+    public decimal? Fee { get; set; }
 
     [JsonPropertyName("date")]
     public DateTime Date { get; set; } = DateTime.Now;

@@ -110,7 +110,7 @@ public class TransactionView
             string dateStr = t.Date.ToString(DateFormat);
 
             string amountStr = t.Amount.ToString("C", _usCulture);
-            string feeStr = t.Fee.ToString("C", _usCulture);
+            string feeStr = t.Fee.HasValue ? t.Fee.Value.ToString("C", _usCulture) : string.Empty;
 
             Console.WriteLine($"{t.Id,-6} {t.Type.GetLabel(),-12} {dateStr,-20} {amountStr,-12} {feeStr,-8} {source,-10} {target,-10} {(t.Description ?? ""),-20}");
         }
@@ -125,7 +125,7 @@ public class TransactionView
         Console.WriteLine($"Transacción Id : {t.Id}");
         Console.WriteLine($"Tipo           : {t.Type.GetLabel()}");
         Console.WriteLine($"Monto          : {t.Amount.ToString("C", _usCulture)}");
-        Console.WriteLine($"Comisión       : {t.Fee.ToString("C", _usCulture)}");
+        Console.WriteLine($"Comisión       : {(t.Fee.HasValue ? t.Fee.Value.ToString("C", _usCulture) : string.Empty)}");
         Console.WriteLine($"Fecha/Hora     : {t.Date.ToString(DateFormat)}");
 
         // Al no ser nulos, EurekaBank suele usar '0' o un ID específico para transacciones globales (como depósitos)
