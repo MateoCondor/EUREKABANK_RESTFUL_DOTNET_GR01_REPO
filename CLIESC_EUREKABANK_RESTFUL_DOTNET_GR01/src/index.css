@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+body {
+  @apply bg-gray-900 text-white;
+}
+
+label {
+  @apply text-gray-300 cursor-pointer;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="tel"] {
+  @apply bg-gray-900 text-white px-4 py-2 rounded-md;
+
+  &:focus-visible {
+    @apply outline-teal-700 outline-1;
+  }
+}
+
+select {
+  @apply bg-gray-900 text-white pl-2 py-2 rounded-md;
+
+  &:focus-visible {
+    @apply outline-teal-700 outline-1;
+  }
+}
+
+button {
+  @apply hover:cursor-pointer;
+}
+
+dialog[open] {
+  @apply block;
+}
+
+legend {
+  @apply text-gray-400;
+}

@@ -1,0 +1,43 @@
+{
+  "name": "cliesc-eurekabank-restful-dotnet-gr01",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build && electron-builder",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "5.2.2",
+    "@tailwindcss/vite": "4.3.0",
+    "@tanstack/react-query": "5.100.10",
+    "axios": "1.16.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-hook-form": "7.76.0",
+    "react-icons": "5.6.0",
+    "react-router": "7.15.1",
+    "tailwindcss": "4.3.0",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/react": "18.2.64",
+    "@types/react-dom": "18.2.21",
+    "@typescript-eslint/eslint-plugin": "7.1.1",
+    "@typescript-eslint/parser": "7.1.1",
+    "@vitejs/plugin-react": "6.0.2",
+    "electron": "30.0.1",
+    "electron-builder": "24.13.3",
+    "esbuild": "0.28.0",
+    "eslint": "8.57.0",
+    "eslint-plugin-react-hooks": "4.6.0",
+    "eslint-plugin-react-refresh": "0.4.5",
+    "typescript": "5.2.2",
+    "vite": "8.0.13",
+    "vite-plugin-electron": "0.28.6",
+    "vite-plugin-electron-renderer": "0.14.7"
+  },
+  "main": "dist-electron/main.js"
+}
