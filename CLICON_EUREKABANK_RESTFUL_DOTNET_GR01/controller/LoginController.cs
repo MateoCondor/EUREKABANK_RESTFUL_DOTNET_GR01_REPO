@@ -4,6 +4,7 @@ using System;
 using System.Threading.Tasks;
 using Ec.Edu.Monster.Model.Client; // Tu cliente concreto AuthClient
 using Ec.Edu.Monster.Model.Dto;
+using Ec.Edu.Monster.Model.Entity;
 using Ec.Edu.Monster.View;
 using Refit;
 
@@ -40,6 +41,7 @@ public class LoginController
 
                 if (response != null)
                 {
+                    UserSession.Instance.SaveSession(response.Token, response.Username, response.Role);
                     _view.ShowWelcome(response.Username);
                     return response;
                 }
