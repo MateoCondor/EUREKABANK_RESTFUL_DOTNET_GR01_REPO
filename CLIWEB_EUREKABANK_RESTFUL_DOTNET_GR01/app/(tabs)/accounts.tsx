@@ -34,6 +34,7 @@ import {
   type AccountStatus,
   type ClientResponse,
 } from '@/services/api';
+import { ScreenBackground } from '@/components/screen-background';
 
 export default function AccountsScreen() {
   const colorScheme = useColorScheme();
@@ -176,282 +177,286 @@ export default function AccountsScreen() {
 
   if (loading) {
     return (
-      <View style={[styles.centered, { backgroundColor: isDark ? '#0F0F23' : '#F0F4F8' }]}>
-        <ActivityIndicator size="large" color="#0D7377" />
-      </View>
+      <ScreenBackground>
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" color="#0D7377" />
+        </View>
+      </ScreenBackground>
     );
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: isDark ? '#0F0F23' : '#F0F4F8' }]}>
-      {/* Header */}
-      <View style={[styles.header, { backgroundColor: isDark ? '#1A1A2E' : '#FFFFFF' }]}>
-        <Text variant="headlineSmall" style={[styles.headerTitle, { color: isDark ? '#E2E8F0' : '#1A1A2E' }]}>
-          Gestión de Cuentas
-        </Text>
-        <View style={[styles.headerBar, { backgroundColor: '#0D7377' }]}>
-          <View style={[styles.headerBarAccent, { backgroundColor: '#D4A843' }]} />
+    <ScreenBackground>
+      <SafeAreaView style={styles.container}>
+        {/* Header */}
+        <View style={[styles.header, { backgroundColor: isDark ? '#1A1A2E' : '#FFFFFF' }]}>
+          <Text variant="headlineSmall" style={[styles.headerTitle, { color: isDark ? '#E2E8F0' : '#1A1A2E' }]}>
+            Gestión de Cuentas
+          </Text>
+          <View style={[styles.headerBar, { backgroundColor: '#0D7377' }]}>
+            <View style={[styles.headerBarAccent, { backgroundColor: '#D4A843' }]} />
+          </View>
         </View>
-      </View>
 
-      {/* Search */}
-      <View style={styles.searchContainer}>
-        <Searchbar
-          placeholder="Buscar por número de cuenta..."
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          style={[styles.searchbar, { backgroundColor: isDark ? '#1A1A2E' : '#FFFFFF' }]}
-          inputStyle={{ color: isDark ? '#E2E8F0' : '#1A1A2E' }}
-          iconColor={isDark ? '#94A3B8' : '#6B7280'}
-          placeholderTextColor={isDark ? '#64748B' : '#94A3B8'}
-        />
-      </View>
-
-      {error ? (
-        <Surface style={[styles.errorCard, { backgroundColor: isDark ? '#3B1A1A' : '#FEF2F2' }]} elevation={1}>
-          <MaterialCommunityIcons name="alert-circle" size={20} color="#CF6679" />
-          <Text style={{ color: '#CF6679', marginLeft: 8, flex: 1 }}>{error}</Text>
-        </Surface>
-      ) : null}
-
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadData(); }} colors={['#0D7377']} />
-        }
-      >
-        {filtered.length === 0 ? (
-          <View style={styles.emptyState}>
-            <MaterialCommunityIcons name="credit-card-off" size={64} color={isDark ? '#2D2D44' : '#CBD5E1'} />
-            <Text style={{ color: isDark ? '#64748B' : '#94A3B8', marginTop: 12, fontSize: 16 }}>
-              No se encontraron cuentas
-            </Text>
-          </View>
-        ) : (
-          <View style={[styles.cardGrid, isWide && styles.cardGridWide]}>
-            {filtered.map((account) => (
-              <Surface
-                key={account.id}
-                style={[
-                  styles.accountCard,
-                  isWide && styles.accountCardWide,
-                  { backgroundColor: isDark ? '#1A1A2E' : '#FFFFFF' },
-                ]}
-                elevation={2}
-              >
-                {/* Card top accent */}
-                <View style={[styles.cardAccent, { backgroundColor: getStatusColor(account.status) }]} />
-
-                <View style={styles.cardBody}>
-                  <View style={styles.cardTopRow}>
-                    <View style={[styles.typeChip, { backgroundColor: isDark ? '#0D737720' : '#0D737710' }]}>
-                      <MaterialCommunityIcons
-                        name={account.type === 'SAVINGS' ? 'piggy-bank' : 'briefcase'}
-                        size={14}
-                        color="#0D7377"
-                      />
-                      <Text style={{ color: '#0D7377', fontSize: 11, fontWeight: '600', marginLeft: 4 }}>
-                        {getTypeLabel(account.type)}
-                      </Text>
-                    </View>
-                    <View
-                      style={[
-                        styles.statusBadge,
-                        { backgroundColor: `${getStatusColor(account.status)}20` },
-                      ]}
-                    >
-                      <Text style={{ color: getStatusColor(account.status), fontSize: 11, fontWeight: '600' }}>
-                        {getStatusLabel(account.status)}
-                      </Text>
-                    </View>
-                  </View>
-
-                  <Text variant="bodySmall" style={{ color: isDark ? '#64748B' : '#94A3B8', marginTop: 12 }}>
-                    Número de Cuenta
-                  </Text>
-                  <Text variant="titleMedium" style={{ color: isDark ? '#E2E8F0' : '#1A1A2E', fontWeight: '600', letterSpacing: 1 }}>
-                    {account.accountNumber}
-                  </Text>
-
-                  <Divider style={{ marginVertical: 12, backgroundColor: isDark ? '#2D2D44' : '#F1F5F9' }} />
-
-                  <Text variant="bodySmall" style={{ color: isDark ? '#64748B' : '#94A3B8' }}>
-                    Saldo disponible
-                  </Text>
-                  <Text variant="headlineSmall" style={{ color: '#0D7377', fontWeight: '700', marginTop: 2 }}>
-                    {formatCurrency(account.balance)}
-                  </Text>
-
-                  <View style={styles.cardDetail}>
-                    <MaterialCommunityIcons name="account" size={16} color={isDark ? '#64748B' : '#94A3B8'} />
-                    <Text variant="bodySmall" style={{ color: isDark ? '#94A3B8' : '#6B7280', marginLeft: 8 }}>
-                      {getClientName(account.clientId)}
-                    </Text>
-                  </View>
-
-                  <View style={styles.cardActions}>
-                    <IconButton
-                      icon="swap-horizontal"
-                      size={20}
-                      iconColor="#0D7377"
-                      onPress={() => openStatusModal(account)}
-                      style={[styles.actionBtn, { backgroundColor: isDark ? '#0D737715' : '#0D737710' }]}
-                    />
-                  </View>
-                </View>
-              </Surface>
-            ))}
-          </View>
-        )}
-      </ScrollView>
-
-      {/* FAB */}
-      <FAB
-        icon="plus"
-        onPress={() => { setFormError(''); setModalVisible(true); }}
-        style={styles.fab}
-        color="#FFFFFF"
-        customSize={56}
-      />
-
-      {/* Create Account Modal */}
-      <Portal>
-        <Modal
-          visible={modalVisible}
-          onDismiss={() => setModalVisible(false)}
-          contentContainerStyle={[styles.modal, { backgroundColor: isDark ? '#1A1A2E' : '#FFFFFF' }]}
-        >
-          <Text variant="titleLarge" style={{ color: isDark ? '#E2E8F0' : '#1A1A2E', fontWeight: '600', marginBottom: 20 }}>
-            Nueva Cuenta
-          </Text>
-
-          <Text variant="bodyMedium" style={{ color: isDark ? '#94A3B8' : '#6B7280', marginBottom: 8 }}>
-            Seleccionar Cliente (ID)
-          </Text>
-          <TextInput
-            label="ID del Cliente"
-            value={formClientId}
-            onChangeText={setFormClientId}
-            mode="outlined"
-            keyboardType="numeric"
-            style={styles.modalInput}
-            outlineColor={isDark ? '#2D2D44' : '#E2E8F0'}
-            activeOutlineColor="#0D7377"
-            textColor={isDark ? '#E2E8F0' : '#1A1A2E'}
+        {/* Search */}
+        <View style={styles.searchContainer}>
+          <Searchbar
+            placeholder="Buscar por número de cuenta..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            style={[styles.searchbar, { backgroundColor: isDark ? '#1A1A2E' : '#FFFFFF' }]}
+            inputStyle={{ color: isDark ? '#E2E8F0' : '#1A1A2E' }}
+            iconColor={isDark ? '#94A3B8' : '#6B7280'}
+            placeholderTextColor={isDark ? '#64748B' : '#94A3B8'}
           />
+        </View>
 
-          {clients.length > 0 && (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }}>
-              {clients.slice(0, 10).map((c) => (
-                <Button
-                  key={c.id}
-                  mode={formClientId === String(c.id) ? 'contained' : 'outlined'}
-                  onPress={() => setFormClientId(String(c.id))}
-                  style={{ marginRight: 8, borderRadius: 20 }}
-                  compact
-                  buttonColor={formClientId === String(c.id) ? '#0D7377' : undefined}
-                  textColor={formClientId === String(c.id) ? '#FFFFFF' : isDark ? '#94A3B8' : '#6B7280'}
+        {error ? (
+          <Surface style={[styles.errorCard, { backgroundColor: isDark ? '#3B1A1A' : '#FEF2F2' }]} elevation={1}>
+            <MaterialCommunityIcons name="alert-circle" size={20} color="#CF6679" />
+            <Text style={{ color: '#CF6679', marginLeft: 8, flex: 1 }}>{error}</Text>
+          </Surface>
+        ) : null}
+
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadData(); }} colors={['#0D7377']} />
+          }
+        >
+          {filtered.length === 0 ? (
+            <View style={styles.emptyState}>
+              <MaterialCommunityIcons name="credit-card-off" size={64} color={isDark ? '#2D2D44' : '#CBD5E1'} />
+              <Text style={{ color: isDark ? '#64748B' : '#94A3B8', marginTop: 12, fontSize: 16 }}>
+                No se encontraron cuentas
+              </Text>
+            </View>
+          ) : (
+            <View style={[styles.cardGrid, isWide && styles.cardGridWide]}>
+              {filtered.map((account) => (
+                <Surface
+                  key={account.id}
+                  style={[
+                    styles.accountCard,
+                    isWide && styles.accountCardWide,
+                    { backgroundColor: isDark ? '#1A1A2E' : '#FFFFFF' },
+                  ]}
+                  elevation={2}
                 >
-                  {c.name}
-                </Button>
+                  {/* Card top accent */}
+                  <View style={[styles.cardAccent, { backgroundColor: getStatusColor(account.status) }]} />
+
+                  <View style={styles.cardBody}>
+                    <View style={styles.cardTopRow}>
+                      <View style={[styles.typeChip, { backgroundColor: isDark ? '#0D737720' : '#0D737710' }]}>
+                        <MaterialCommunityIcons
+                          name={account.type === 'SAVINGS' ? 'piggy-bank' : 'briefcase'}
+                          size={14}
+                          color="#0D7377"
+                        />
+                        <Text style={{ color: '#0D7377', fontSize: 11, fontWeight: '600', marginLeft: 4 }}>
+                          {getTypeLabel(account.type)}
+                        </Text>
+                      </View>
+                      <View
+                        style={[
+                          styles.statusBadge,
+                          { backgroundColor: `${getStatusColor(account.status)}20` },
+                        ]}
+                      >
+                        <Text style={{ color: getStatusColor(account.status), fontSize: 11, fontWeight: '600' }}>
+                          {getStatusLabel(account.status)}
+                        </Text>
+                      </View>
+                    </View>
+
+                    <Text variant="bodySmall" style={{ color: isDark ? '#64748B' : '#94A3B8', marginTop: 12 }}>
+                      Número de Cuenta
+                    </Text>
+                    <Text variant="titleMedium" style={{ color: isDark ? '#E2E8F0' : '#1A1A2E', fontWeight: '600', letterSpacing: 1 }}>
+                      {account.accountNumber}
+                    </Text>
+
+                    <Divider style={{ marginVertical: 12, backgroundColor: isDark ? '#2D2D44' : '#F1F5F9' }} />
+
+                    <Text variant="bodySmall" style={{ color: isDark ? '#64748B' : '#94A3B8' }}>
+                      Saldo disponible
+                    </Text>
+                    <Text variant="headlineSmall" style={{ color: '#0D7377', fontWeight: '700', marginTop: 2 }}>
+                      {formatCurrency(account.balance)}
+                    </Text>
+
+                    <View style={styles.cardDetail}>
+                      <MaterialCommunityIcons name="account" size={16} color={isDark ? '#64748B' : '#94A3B8'} />
+                      <Text variant="bodySmall" style={{ color: isDark ? '#94A3B8' : '#6B7280', marginLeft: 8 }}>
+                        {getClientName(account.clientId)}
+                      </Text>
+                    </View>
+
+                    <View style={styles.cardActions}>
+                      <IconButton
+                        icon="swap-horizontal"
+                        size={20}
+                        iconColor="#0D7377"
+                        onPress={() => openStatusModal(account)}
+                        style={[styles.actionBtn, { backgroundColor: isDark ? '#0D737715' : '#0D737710' }]}
+                      />
+                    </View>
+                  </View>
+                </Surface>
               ))}
-            </ScrollView>
+            </View>
           )}
+        </ScrollView>
 
-          <Text variant="bodyMedium" style={{ color: isDark ? '#94A3B8' : '#6B7280', marginBottom: 8, marginTop: 8 }}>
-            Tipo de Cuenta
-          </Text>
-          <SegmentedButtons
-            value={formType}
-            onValueChange={(v) => setFormType(v as AccountType)}
-            buttons={[
-              { value: 'SAVINGS', label: 'Ahorros', icon: 'piggy-bank' },
-              { value: 'CURRENT', label: 'Corriente', icon: 'briefcase' },
-            ]}
-            style={{ marginBottom: 16 }}
-          />
+        {/* FAB */}
+        <FAB
+          icon="plus"
+          onPress={() => { setFormError(''); setModalVisible(true); }}
+          style={styles.fab}
+          color="#FFFFFF"
+          customSize={56}
+        />
 
-          {formError ? (
-            <HelperText type="error" visible>
-              {formError}
-            </HelperText>
-          ) : null}
-
-          <View style={styles.modalActions}>
-            <Button
-              mode="outlined"
-              onPress={() => setModalVisible(false)}
-              style={styles.modalBtn}
-              textColor={isDark ? '#94A3B8' : '#6B7280'}
-            >
-              Cancelar
-            </Button>
-            <Button
-              mode="contained"
-              onPress={handleCreate}
-              loading={submitting}
-              disabled={submitting}
-              style={styles.modalBtn}
-              buttonColor="#0D7377"
-              textColor="#FFFFFF"
-            >
-              Crear Cuenta
-            </Button>
-          </View>
-        </Modal>
-      </Portal>
-
-      {/* Update Status Modal */}
-      <Portal>
-        <Modal
-          visible={statusModalVisible}
-          onDismiss={() => setStatusModalVisible(false)}
-          contentContainerStyle={[styles.modal, { backgroundColor: isDark ? '#1A1A2E' : '#FFFFFF' }]}
-        >
-          <Text variant="titleLarge" style={{ color: isDark ? '#E2E8F0' : '#1A1A2E', fontWeight: '600', marginBottom: 20 }}>
-            Cambiar Estado
-          </Text>
-          {statusAccount && (
-            <Text variant="bodyMedium" style={{ color: isDark ? '#94A3B8' : '#6B7280', marginBottom: 16 }}>
-              Cuenta: {statusAccount.accountNumber}
+        {/* Create Account Modal */}
+        <Portal>
+          <Modal
+            visible={modalVisible}
+            onDismiss={() => setModalVisible(false)}
+            contentContainerStyle={[styles.modal, { backgroundColor: isDark ? '#1A1A2E' : '#FFFFFF' }]}
+          >
+            <Text variant="titleLarge" style={{ color: isDark ? '#E2E8F0' : '#1A1A2E', fontWeight: '600', marginBottom: 20 }}>
+              Nueva Cuenta
             </Text>
-          )}
 
-          <SegmentedButtons
-            value={newStatus}
-            onValueChange={(v) => setNewStatus(v as AccountStatus)}
-            buttons={[
-              { value: 'ACTIVE', label: 'Activa' },
-              { value: 'BLOCKED', label: 'Bloqueada' },
-              { value: 'CLOSED', label: 'Cerrada' },
-            ]}
-            style={{ marginBottom: 20 }}
-          />
-
-          <View style={styles.modalActions}>
-            <Button
+            <Text variant="bodyMedium" style={{ color: isDark ? '#94A3B8' : '#6B7280', marginBottom: 8 }}>
+              Seleccionar Cliente (ID)
+            </Text>
+            <TextInput
+              label="ID del Cliente"
+              value={formClientId}
+              onChangeText={setFormClientId}
               mode="outlined"
-              onPress={() => setStatusModalVisible(false)}
-              style={styles.modalBtn}
-              textColor={isDark ? '#94A3B8' : '#6B7280'}
-            >
-              Cancelar
-            </Button>
-            <Button
-              mode="contained"
-              onPress={handleUpdateStatus}
-              loading={submitting}
-              disabled={submitting}
-              style={styles.modalBtn}
-              buttonColor="#0D7377"
-              textColor="#FFFFFF"
-            >
-              Actualizar
-            </Button>
-          </View>
-        </Modal>
-      </Portal>
-    </SafeAreaView>
+              keyboardType="numeric"
+              style={styles.modalInput}
+              outlineColor={isDark ? '#2D2D44' : '#E2E8F0'}
+              activeOutlineColor="#0D7377"
+              textColor={isDark ? '#E2E8F0' : '#1A1A2E'}
+            />
+
+            {clients.length > 0 && (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }}>
+                {clients.slice(0, 10).map((c) => (
+                  <Button
+                    key={c.id}
+                    mode={formClientId === String(c.id) ? 'contained' : 'outlined'}
+                    onPress={() => setFormClientId(String(c.id))}
+                    style={{ marginRight: 8, borderRadius: 20 }}
+                    compact
+                    buttonColor={formClientId === String(c.id) ? '#0D7377' : undefined}
+                    textColor={formClientId === String(c.id) ? '#FFFFFF' : isDark ? '#94A3B8' : '#6B7280'}
+                  >
+                    {c.name}
+                  </Button>
+                ))}
+              </ScrollView>
+            )}
+
+            <Text variant="bodyMedium" style={{ color: isDark ? '#94A3B8' : '#6B7280', marginBottom: 8, marginTop: 8 }}>
+              Tipo de Cuenta
+            </Text>
+            <SegmentedButtons
+              value={formType}
+              onValueChange={(v) => setFormType(v as AccountType)}
+              buttons={[
+                { value: 'SAVINGS', label: 'Ahorros', icon: 'piggy-bank' },
+                { value: 'CURRENT', label: 'Corriente', icon: 'briefcase' },
+              ]}
+              style={{ marginBottom: 16 }}
+            />
+
+            {formError ? (
+              <HelperText type="error" visible>
+                {formError}
+              </HelperText>
+            ) : null}
+
+            <View style={styles.modalActions}>
+              <Button
+                mode="outlined"
+                onPress={() => setModalVisible(false)}
+                style={styles.modalBtn}
+                textColor={isDark ? '#94A3B8' : '#6B7280'}
+              >
+                Cancelar
+              </Button>
+              <Button
+                mode="contained"
+                onPress={handleCreate}
+                loading={submitting}
+                disabled={submitting}
+                style={styles.modalBtn}
+                buttonColor="#0D7377"
+                textColor="#FFFFFF"
+              >
+                Crear Cuenta
+              </Button>
+            </View>
+          </Modal>
+        </Portal>
+
+        {/* Update Status Modal */}
+        <Portal>
+          <Modal
+            visible={statusModalVisible}
+            onDismiss={() => setStatusModalVisible(false)}
+            contentContainerStyle={[styles.modal, { backgroundColor: isDark ? '#1A1A2E' : '#FFFFFF' }]}
+          >
+            <Text variant="titleLarge" style={{ color: isDark ? '#E2E8F0' : '#1A1A2E', fontWeight: '600', marginBottom: 20 }}>
+              Cambiar Estado
+            </Text>
+            {statusAccount && (
+              <Text variant="bodyMedium" style={{ color: isDark ? '#94A3B8' : '#6B7280', marginBottom: 16 }}>
+                Cuenta: {statusAccount.accountNumber}
+              </Text>
+            )}
+
+            <SegmentedButtons
+              value={newStatus}
+              onValueChange={(v) => setNewStatus(v as AccountStatus)}
+              buttons={[
+                { value: 'ACTIVE', label: 'Activa' },
+                { value: 'BLOCKED', label: 'Bloqueada' },
+                { value: 'CLOSED', label: 'Cerrada' },
+              ]}
+              style={{ marginBottom: 20 }}
+            />
+
+            <View style={styles.modalActions}>
+              <Button
+                mode="outlined"
+                onPress={() => setStatusModalVisible(false)}
+                style={styles.modalBtn}
+                textColor={isDark ? '#94A3B8' : '#6B7280'}
+              >
+                Cancelar
+              </Button>
+              <Button
+                mode="contained"
+                onPress={handleUpdateStatus}
+                loading={submitting}
+                disabled={submitting}
+                style={styles.modalBtn}
+                buttonColor="#0D7377"
+                textColor="#FFFFFF"
+              >
+                Actualizar
+              </Button>
+            </View>
+          </Modal>
+        </Portal>
+      </SafeAreaView>
+    </ScreenBackground>
   );
 }
 

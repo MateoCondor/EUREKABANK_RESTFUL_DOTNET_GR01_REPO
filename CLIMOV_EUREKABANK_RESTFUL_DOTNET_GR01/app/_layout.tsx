@@ -18,10 +18,16 @@ function RootNavigator() {
     if (isLoading) return;
 
     const inAuthGroup = segments[0] === 'login';
+    const inTabsGroup = segments[0] === '(tabs)';
 
-    if (!isAuthenticated && !inAuthGroup) {
-      router.replace('/login');
-    } else if (isAuthenticated && inAuthGroup) {
+    if (!isAuthenticated) {
+      if (!inAuthGroup) {
+        router.replace('/login');
+      }
+      return;
+    }
+
+    if (!inTabsGroup) {
       router.replace('/(tabs)');
     }
   }, [isAuthenticated, isLoading, segments]);

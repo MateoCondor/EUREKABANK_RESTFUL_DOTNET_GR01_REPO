@@ -22,6 +22,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '@/context/AuthContext';
 import { parametersApi, type ParameterResponse } from '@/services/api';
+import { ScreenBackground } from '@/components/screen-background';
 
 export default function SettingsScreen() {
   const colorScheme = useColorScheme();
@@ -115,222 +116,224 @@ export default function SettingsScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: isDark ? '#0F0F23' : '#F0F4F8' }]}>
-      {/* Header */}
-      <View style={[styles.header, { backgroundColor: isDark ? '#1A1A2E' : '#FFFFFF' }]}>
-        <Text variant="headlineSmall" style={[styles.headerTitle, { color: isDark ? '#E2E8F0' : '#1A1A2E' }]}>
-          Ajustes y Parámetros
-        </Text>
-        <View style={[styles.headerBar, { backgroundColor: '#0D7377' }]}>
-          <View style={[styles.headerBarAccent, { backgroundColor: '#D4A843' }]} />
+    <ScreenBackground>
+      <SafeAreaView style={styles.container}>
+        {/* Header */}
+        <View style={[styles.header, { backgroundColor: isDark ? '#1A1A2E' : '#FFFFFF' }]}>
+          <Text variant="headlineSmall" style={[styles.headerTitle, { color: isDark ? '#E2E8F0' : '#1A1A2E' }]}>
+            Ajustes y Parámetros
+          </Text>
+          <View style={[styles.headerBar, { backgroundColor: '#0D7377' }]}>
+            <View style={[styles.headerBarAccent, { backgroundColor: '#D4A843' }]} />
+          </View>
         </View>
-      </View>
 
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadParameters(); }} colors={['#0D7377']} />
-        }
-      >
-        {/* User Info Card */}
-        <Surface
-          style={[styles.card, { backgroundColor: isDark ? '#1A1A2E' : '#FFFFFF' }]}
-          elevation={2}
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadParameters(); }} colors={['#0D7377']} />
+          }
         >
-          <View style={styles.userSection}>
-            <View style={[styles.userAvatar, { backgroundColor: '#0D737720' }]}>
-              <MaterialCommunityIcons name="account-circle" size={40} color="#0D7377" />
-            </View>
-            <View style={styles.userInfo}>
-              <Text variant="titleMedium" style={{ color: isDark ? '#E2E8F0' : '#1A1A2E', fontWeight: '600' }}>
-                {username ?? 'Usuario'}
-              </Text>
-              <View style={[styles.roleBadge, { backgroundColor: '#0D737720' }]}>
-                <Text style={{ color: '#0D7377', fontSize: 11, fontWeight: '600' }}>
-                  {role ?? 'USER'}
+          {/* User Info Card */}
+          <Surface
+            style={[styles.card, { backgroundColor: isDark ? '#1A1A2E' : '#FFFFFF' }]}
+            elevation={2}
+          >
+            <View style={styles.userSection}>
+              <View style={[styles.userAvatar, { backgroundColor: '#0D737720' }]}>
+                <MaterialCommunityIcons name="account-circle" size={40} color="#0D7377" />
+              </View>
+              <View style={styles.userInfo}>
+                <Text variant="titleMedium" style={{ color: isDark ? '#E2E8F0' : '#1A1A2E', fontWeight: '600' }}>
+                  {username ?? 'Usuario'}
                 </Text>
+                <View style={[styles.roleBadge, { backgroundColor: '#0D737720' }]}>
+                  <Text style={{ color: '#0D7377', fontSize: 11, fontWeight: '600' }}>
+                    {role ?? 'USER'}
+                  </Text>
+                </View>
               </View>
             </View>
-          </View>
 
-          <Divider style={{ marginVertical: 16, backgroundColor: isDark ? '#2D2D44' : '#E2E8F0' }} />
+            <Divider style={{ marginVertical: 16, backgroundColor: isDark ? '#2D2D44' : '#E2E8F0' }} />
 
-          <Button
-            mode="outlined"
-            icon="logout"
-            onPress={handleLogout}
-            textColor="#CF6679"
-            style={[styles.logoutBtn, { borderColor: '#CF667940' }]}
-          >
-            Cerrar Sesión
-          </Button>
-        </Surface>
-
-        {/* System Parameters */}
-        <View style={styles.sectionHeaderRow}>
-          <Text variant="titleMedium" style={{ color: isDark ? '#E2E8F0' : '#1A1A2E', fontWeight: '600' }}>
-            Parámetros del Sistema
-          </Text>
-          <Button
-            mode="contained"
-            icon="plus"
-            onPress={openCreate}
-            compact
-            buttonColor="#0D7377"
-            textColor="#FFFFFF"
-            style={{ borderRadius: 10 }}
-          >
-            Nuevo
-          </Button>
-        </View>
-
-        {error ? (
-          <Surface style={[styles.errorCard, { backgroundColor: isDark ? '#3B1A1A' : '#FEF2F2' }]} elevation={1}>
-            <MaterialCommunityIcons name="alert-circle" size={20} color="#CF6679" />
-            <Text style={{ color: '#CF6679', marginLeft: 8, flex: 1 }}>{error}</Text>
-          </Surface>
-        ) : null}
-
-        {loading ? (
-          <ActivityIndicator size="large" color="#0D7377" style={{ marginTop: 32 }} />
-        ) : parameters.length === 0 ? (
-          <View style={styles.emptyState}>
-            <MaterialCommunityIcons name="cog-off" size={48} color={isDark ? '#2D2D44' : '#CBD5E1'} />
-            <Text style={{ color: isDark ? '#64748B' : '#94A3B8', marginTop: 12 }}>
-              No hay parámetros configurados
-            </Text>
-          </View>
-        ) : (
-          parameters.map((param) => (
-            <Surface
-              key={param.id}
-              style={[styles.paramCard, { backgroundColor: isDark ? '#1A1A2E' : '#FFFFFF' }]}
-              elevation={1}
-            >
-              <View style={styles.paramRow}>
-                <View style={[styles.paramIcon, { backgroundColor: isDark ? '#D4A84315' : '#D4A84310' }]}>
-                  <MaterialCommunityIcons name="key-variant" size={20} color="#D4A843" />
-                </View>
-                <View style={styles.paramInfo}>
-                  <Text variant="bodyLarge" style={{ color: isDark ? '#E2E8F0' : '#1A1A2E', fontWeight: '600' }}>
-                    {param.key}
-                  </Text>
-                  <Text variant="bodyMedium" style={{ color: '#0D7377', fontWeight: '500', marginTop: 2 }}>
-                    {param.value}
-                  </Text>
-                  {param.description ? (
-                    <Text variant="bodySmall" style={{ color: isDark ? '#64748B' : '#94A3B8', marginTop: 4 }}>
-                      {param.description}
-                    </Text>
-                  ) : null}
-                </View>
-                <IconButton
-                  icon="pencil"
-                  size={20}
-                  iconColor="#D4A843"
-                  onPress={() => openEdit(param)}
-                  style={[styles.editBtn, { backgroundColor: isDark ? '#D4A84315' : '#D4A84310' }]}
-                />
-              </View>
-            </Surface>
-          ))
-        )}
-
-        {/* App Info */}
-        <Surface
-          style={[styles.card, { backgroundColor: isDark ? '#1A1A2E' : '#FFFFFF', marginTop: 24 }]}
-          elevation={1}
-        >
-          <View style={{ alignItems: 'center' }}>
-            <MaterialCommunityIcons name="bank" size={32} color="#0D7377" />
-            <Text variant="bodyLarge" style={{ color: isDark ? '#E2E8F0' : '#1A1A2E', fontWeight: '600', marginTop: 8 }}>
-              EurekaBank Mobile & Web
-            </Text>
-            <Text variant="bodySmall" style={{ color: isDark ? '#64748B' : '#94A3B8', marginTop: 4 }}>
-              Versión 1.0.0 • Arquitectura GR01
-            </Text>
-            <Text variant="bodySmall" style={{ color: isDark ? '#475569' : '#CBD5E1', marginTop: 2 }}>
-              Powered by Jakarta EE + React Native
-            </Text>
-          </View>
-        </Surface>
-      </ScrollView>
-
-      {/* Parameter Modal */}
-      <Portal>
-        <Modal
-          visible={modalVisible}
-          onDismiss={() => setModalVisible(false)}
-          contentContainerStyle={[styles.modal, { backgroundColor: isDark ? '#1A1A2E' : '#FFFFFF' }]}
-        >
-          <Text variant="titleLarge" style={{ color: isDark ? '#E2E8F0' : '#1A1A2E', fontWeight: '600', marginBottom: 20 }}>
-            {modalMode === 'create' ? 'Nuevo Parámetro' : 'Editar Parámetro'}
-          </Text>
-
-          <TextInput
-            label="Clave"
-            value={formKey}
-            onChangeText={setFormKey}
-            mode="outlined"
-            style={styles.modalInput}
-            outlineColor={isDark ? '#2D2D44' : '#E2E8F0'}
-            activeOutlineColor="#0D7377"
-            textColor={isDark ? '#E2E8F0' : '#1A1A2E'}
-            disabled={modalMode === 'edit'}
-          />
-          <TextInput
-            label="Valor"
-            value={formValue}
-            onChangeText={setFormValue}
-            mode="outlined"
-            style={styles.modalInput}
-            outlineColor={isDark ? '#2D2D44' : '#E2E8F0'}
-            activeOutlineColor="#0D7377"
-            textColor={isDark ? '#E2E8F0' : '#1A1A2E'}
-          />
-          <TextInput
-            label="Descripción (opcional)"
-            value={formDesc}
-            onChangeText={setFormDesc}
-            mode="outlined"
-            multiline
-            numberOfLines={2}
-            style={styles.modalInput}
-            outlineColor={isDark ? '#2D2D44' : '#E2E8F0'}
-            activeOutlineColor="#0D7377"
-            textColor={isDark ? '#E2E8F0' : '#1A1A2E'}
-          />
-
-          {formError ? (
-            <HelperText type="error" visible>
-              {formError}
-            </HelperText>
-          ) : null}
-
-          <View style={styles.modalActions}>
             <Button
               mode="outlined"
-              onPress={() => setModalVisible(false)}
-              style={styles.modalBtn}
-              textColor={isDark ? '#94A3B8' : '#6B7280'}
+              icon="logout"
+              onPress={handleLogout}
+              textColor="#CF6679"
+              style={[styles.logoutBtn, { borderColor: '#CF667940' }]}
             >
-              Cancelar
+              Cerrar Sesión
             </Button>
+          </Surface>
+
+          {/* System Parameters */}
+          <View style={styles.sectionHeaderRow}>
+            <Text variant="titleMedium" style={{ color: isDark ? '#E2E8F0' : '#1A1A2E', fontWeight: '600' }}>
+              Parámetros del Sistema
+            </Text>
             <Button
               mode="contained"
-              onPress={handleSubmit}
-              loading={submitting}
-              disabled={submitting}
-              style={styles.modalBtn}
+              icon="plus"
+              onPress={openCreate}
+              compact
               buttonColor="#0D7377"
               textColor="#FFFFFF"
+              style={{ borderRadius: 10 }}
             >
-              {modalMode === 'create' ? 'Crear' : 'Guardar'}
+              Nuevo
             </Button>
           </View>
-        </Modal>
-      </Portal>
-    </SafeAreaView>
+
+          {error ? (
+            <Surface style={[styles.errorCard, { backgroundColor: isDark ? '#3B1A1A' : '#FEF2F2' }]} elevation={1}>
+              <MaterialCommunityIcons name="alert-circle" size={20} color="#CF6679" />
+              <Text style={{ color: '#CF6679', marginLeft: 8, flex: 1 }}>{error}</Text>
+            </Surface>
+          ) : null}
+
+          {loading ? (
+            <ActivityIndicator size="large" color="#0D7377" style={{ marginTop: 32 }} />
+          ) : parameters.length === 0 ? (
+            <View style={styles.emptyState}>
+              <MaterialCommunityIcons name="cog-off" size={48} color={isDark ? '#2D2D44' : '#CBD5E1'} />
+              <Text style={{ color: isDark ? '#64748B' : '#94A3B8', marginTop: 12 }}>
+                No hay parámetros configurados
+              </Text>
+            </View>
+          ) : (
+            parameters.map((param) => (
+              <Surface
+                key={param.id}
+                style={[styles.paramCard, { backgroundColor: isDark ? '#1A1A2E' : '#FFFFFF' }]}
+                elevation={1}
+              >
+                <View style={styles.paramRow}>
+                  <View style={[styles.paramIcon, { backgroundColor: isDark ? '#D4A84315' : '#D4A84310' }]}>
+                    <MaterialCommunityIcons name="key-variant" size={20} color="#D4A843" />
+                  </View>
+                  <View style={styles.paramInfo}>
+                    <Text variant="bodyLarge" style={{ color: isDark ? '#E2E8F0' : '#1A1A2E', fontWeight: '600' }}>
+                      {param.key}
+                    </Text>
+                    <Text variant="bodyMedium" style={{ color: '#0D7377', fontWeight: '500', marginTop: 2 }}>
+                      {param.value}
+                    </Text>
+                    {param.description ? (
+                      <Text variant="bodySmall" style={{ color: isDark ? '#64748B' : '#94A3B8', marginTop: 4 }}>
+                        {param.description}
+                      </Text>
+                    ) : null}
+                  </View>
+                  <IconButton
+                    icon="pencil"
+                    size={20}
+                    iconColor="#D4A843"
+                    onPress={() => openEdit(param)}
+                    style={[styles.editBtn, { backgroundColor: isDark ? '#D4A84315' : '#D4A84310' }]}
+                  />
+                </View>
+              </Surface>
+            ))
+          )}
+
+          {/* App Info */}
+          <Surface
+            style={[styles.card, { backgroundColor: isDark ? '#1A1A2E' : '#FFFFFF', marginTop: 24 }]}
+            elevation={1}
+          >
+            <View style={{ alignItems: 'center' }}>
+              <MaterialCommunityIcons name="bank" size={32} color="#0D7377" />
+              <Text variant="bodyLarge" style={{ color: isDark ? '#E2E8F0' : '#1A1A2E', fontWeight: '600', marginTop: 8 }}>
+                EurekaBank Mobile & Web
+              </Text>
+              <Text variant="bodySmall" style={{ color: isDark ? '#64748B' : '#94A3B8', marginTop: 4 }}>
+                Versión 1.0.0 • Arquitectura GR01
+              </Text>
+              <Text variant="bodySmall" style={{ color: isDark ? '#475569' : '#CBD5E1', marginTop: 2 }}>
+                Powered by Jakarta EE + React Native
+              </Text>
+            </View>
+          </Surface>
+        </ScrollView>
+
+        {/* Parameter Modal */}
+        <Portal>
+          <Modal
+            visible={modalVisible}
+            onDismiss={() => setModalVisible(false)}
+            contentContainerStyle={[styles.modal, { backgroundColor: isDark ? '#1A1A2E' : '#FFFFFF' }]}
+          >
+            <Text variant="titleLarge" style={{ color: isDark ? '#E2E8F0' : '#1A1A2E', fontWeight: '600', marginBottom: 20 }}>
+              {modalMode === 'create' ? 'Nuevo Parámetro' : 'Editar Parámetro'}
+            </Text>
+
+            <TextInput
+              label="Clave"
+              value={formKey}
+              onChangeText={setFormKey}
+              mode="outlined"
+              style={styles.modalInput}
+              outlineColor={isDark ? '#2D2D44' : '#E2E8F0'}
+              activeOutlineColor="#0D7377"
+              textColor={isDark ? '#E2E8F0' : '#1A1A2E'}
+              disabled={modalMode === 'edit'}
+            />
+            <TextInput
+              label="Valor"
+              value={formValue}
+              onChangeText={setFormValue}
+              mode="outlined"
+              style={styles.modalInput}
+              outlineColor={isDark ? '#2D2D44' : '#E2E8F0'}
+              activeOutlineColor="#0D7377"
+              textColor={isDark ? '#E2E8F0' : '#1A1A2E'}
+            />
+            <TextInput
+              label="Descripción (opcional)"
+              value={formDesc}
+              onChangeText={setFormDesc}
+              mode="outlined"
+              multiline
+              numberOfLines={2}
+              style={styles.modalInput}
+              outlineColor={isDark ? '#2D2D44' : '#E2E8F0'}
+              activeOutlineColor="#0D7377"
+              textColor={isDark ? '#E2E8F0' : '#1A1A2E'}
+            />
+
+            {formError ? (
+              <HelperText type="error" visible>
+                {formError}
+              </HelperText>
+            ) : null}
+
+            <View style={styles.modalActions}>
+              <Button
+                mode="outlined"
+                onPress={() => setModalVisible(false)}
+                style={styles.modalBtn}
+                textColor={isDark ? '#94A3B8' : '#6B7280'}
+              >
+                Cancelar
+              </Button>
+              <Button
+                mode="contained"
+                onPress={handleSubmit}
+                loading={submitting}
+                disabled={submitting}
+                style={styles.modalBtn}
+                buttonColor="#0D7377"
+                textColor="#FFFFFF"
+              >
+                {modalMode === 'create' ? 'Crear' : 'Guardar'}
+              </Button>
+            </View>
+          </Modal>
+        </Portal>
+      </SafeAreaView>
+    </ScreenBackground>
   );
 }
 

@@ -12,6 +12,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '@/context/AuthContext';
 import { clientsApi, accountsApi, type ClientResponse, type AccountResponse } from '@/services/api';
+import { ScreenBackground } from '@/components/screen-background';
 
 interface DashboardStats {
   totalClients: number;
@@ -108,146 +109,150 @@ export default function DashboardScreen() {
 
   if (loading) {
     return (
-      <View style={[styles.centered, { backgroundColor: isDark ? '#0F0F23' : '#F0F4F8' }]}>
-        <ActivityIndicator size="large" color="#0D7377" />
-        <Text style={{ marginTop: 16, color: isDark ? '#94A3B8' : '#6B7280' }}>
-          Cargando dashboard...
-        </Text>
-      </View>
+      <ScreenBackground>
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" color="#0D7377" />
+          <Text style={{ marginTop: 16, color: isDark ? '#94A3B8' : '#6B7280' }}>
+            Cargando dashboard...
+          </Text>
+        </View>
+      </ScreenBackground>
     );
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: isDark ? '#0F0F23' : '#F0F4F8' }]}>
-      {/* Header */}
-      <View style={[styles.header, { backgroundColor: isDark ? '#1A1A2E' : '#FFFFFF' }]}>
-        <View style={styles.headerContent}>
-          <View>
-            <Text variant="bodySmall" style={{ color: isDark ? '#94A3B8' : '#6B7280' }}>
-              Bienvenido de vuelta
-            </Text>
-            <Text variant="headlineSmall" style={[styles.headerTitle, { color: isDark ? '#E2E8F0' : '#1A1A2E' }]}>
-              {username ?? 'Usuario'}
-            </Text>
-          </View>
-          <View style={[styles.roleBadge, { backgroundColor: '#0D737720' }]}>
-            <Text style={styles.roleText}>{role ?? 'USER'}</Text>
-          </View>
-        </View>
-        <View style={[styles.headerBar, { backgroundColor: '#0D7377' }]}>
-          <View style={[styles.headerBarAccent, { backgroundColor: '#D4A843' }]} />
-        </View>
-      </View>
-
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#0D7377']} />
-        }
-      >
-        {error ? (
-          <Surface style={[styles.errorCard, { backgroundColor: isDark ? '#3B1A1A' : '#FEF2F2' }]} elevation={1}>
-            <MaterialCommunityIcons name="alert-circle" size={20} color="#CF6679" />
-            <Text style={{ color: '#CF6679', marginLeft: 8, flex: 1 }}>{error}</Text>
-            <IconButton icon="refresh" size={20} onPress={loadDashboard} iconColor="#CF6679" />
-          </Surface>
-        ) : null}
-
-        {/* Stat Cards Grid */}
-        <View style={[styles.statsGrid, isWide && styles.statsGridWide]}>
-          {statCards.map((card, index) => (
-            <Surface
-              key={index}
-              style={[
-                styles.statCard,
-                isWide && styles.statCardWide,
-                { backgroundColor: isDark ? '#1A1A2E' : '#FFFFFF' },
-              ]}
-              elevation={2}
-            >
-              <View style={[styles.statIconContainer, { backgroundColor: card.bgColor }]}>
-                <MaterialCommunityIcons name={card.icon} size={28} color={card.color} />
-              </View>
-              <Text variant="bodySmall" style={{ color: isDark ? '#94A3B8' : '#6B7280', marginTop: 12 }}>
-                {card.title}
+    <ScreenBackground>
+      <SafeAreaView style={styles.container}>
+        {/* Header */}
+        <View style={[styles.header, { backgroundColor: isDark ? '#1A1A2E' : '#FFFFFF' }]}>
+          <View style={styles.headerContent}>
+            <View>
+              <Text variant="bodySmall" style={{ color: isDark ? '#94A3B8' : '#6B7280' }}>
+                Bienvenido de vuelta
               </Text>
-              <Text
-                variant="headlineSmall"
-                style={[styles.statValue, { color: isDark ? '#E2E8F0' : '#1A1A2E' }]}
-              >
-                {card.value}
+              <Text variant="headlineSmall" style={[styles.headerTitle, { color: isDark ? '#E2E8F0' : '#1A1A2E' }]}>
+                {username ?? 'Usuario'}
               </Text>
-            </Surface>
-          ))}
+            </View>
+            <View style={[styles.roleBadge, { backgroundColor: '#0D737720' }]}>
+              <Text style={styles.roleText}>{role ?? 'USER'}</Text>
+            </View>
+          </View>
+          <View style={[styles.headerBar, { backgroundColor: '#0D7377' }]}>
+            <View style={[styles.headerBarAccent, { backgroundColor: '#D4A843' }]} />
+          </View>
         </View>
 
-        {/* Recent Clients */}
-        <Surface
-          style={[styles.sectionCard, { backgroundColor: isDark ? '#1A1A2E' : '#FFFFFF' }]}
-          elevation={2}
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#0D7377']} />
+          }
         >
-          <View style={styles.sectionHeader}>
-            <Text variant="titleMedium" style={{ color: isDark ? '#E2E8F0' : '#1A1A2E', fontWeight: '600' }}>
-              Clientes Recientes
-            </Text>
-            <MaterialCommunityIcons name="account-group" size={20} color={isDark ? '#94A3B8' : '#6B7280'} />
-          </View>
-          <Divider style={{ marginBottom: 8, backgroundColor: isDark ? '#2D2D44' : '#E2E8F0' }} />
-          {recentClients.length === 0 ? (
-            <Text style={{ color: isDark ? '#64748B' : '#94A3B8', textAlign: 'center', paddingVertical: 20 }}>
-              No hay clientes registrados
-            </Text>
-          ) : (
-            recentClients.map((client, index) => (
-              <View key={client.id}>
-                <View style={styles.clientRow}>
-                  <View style={[styles.clientAvatar, { backgroundColor: '#0D737720' }]}>
-                    <Text style={{ color: '#0D7377', fontWeight: '700', fontSize: 16 }}>
-                      {client.name.charAt(0).toUpperCase()}
-                    </Text>
-                  </View>
-                  <View style={styles.clientInfo}>
-                    <Text
-                      variant="bodyMedium"
-                      style={{ color: isDark ? '#E2E8F0' : '#1A1A2E', fontWeight: '500' }}
-                    >
-                      {client.name}
-                    </Text>
-                    <Text variant="bodySmall" style={{ color: isDark ? '#64748B' : '#94A3B8' }}>
-                      DNI: {client.dni} • {client.email}
-                    </Text>
-                  </View>
-                  <View
-                    style={[
-                      styles.statusBadge,
-                      {
-                        backgroundColor:
-                          client.status === 'ACTIVE'
-                            ? isDark ? '#2ECC7120' : '#2ECC7115'
-                            : isDark ? '#CF667920' : '#CF667915',
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 11,
-                        fontWeight: '600',
-                        color: client.status === 'ACTIVE' ? '#2ECC71' : '#CF6679',
-                      }}
-                    >
-                      {client.status === 'ACTIVE' ? 'Activo' : 'Inactivo'}
-                    </Text>
-                  </View>
+          {error ? (
+            <Surface style={[styles.errorCard, { backgroundColor: isDark ? '#3B1A1A' : '#FEF2F2' }]} elevation={1}>
+              <MaterialCommunityIcons name="alert-circle" size={20} color="#CF6679" />
+              <Text style={{ color: '#CF6679', marginLeft: 8, flex: 1 }}>{error}</Text>
+              <IconButton icon="refresh" size={20} onPress={loadDashboard} iconColor="#CF6679" />
+            </Surface>
+          ) : null}
+
+          {/* Stat Cards Grid */}
+          <View style={[styles.statsGrid, isWide && styles.statsGridWide]}>
+            {statCards.map((card, index) => (
+              <Surface
+                key={index}
+                style={[
+                  styles.statCard,
+                  isWide && styles.statCardWide,
+                  { backgroundColor: isDark ? '#1A1A2E' : '#FFFFFF' },
+                ]}
+                elevation={2}
+              >
+                <View style={[styles.statIconContainer, { backgroundColor: card.bgColor }]}>
+                  <MaterialCommunityIcons name={card.icon} size={28} color={card.color} />
                 </View>
-                {index < recentClients.length - 1 && (
-                  <Divider style={{ marginVertical: 4, backgroundColor: isDark ? '#2D2D44' : '#F1F5F9' }} />
-                )}
-              </View>
-            ))
-          )}
-        </Surface>
-      </ScrollView>
-    </SafeAreaView>
+                <Text variant="bodySmall" style={{ color: isDark ? '#94A3B8' : '#6B7280', marginTop: 12 }}>
+                  {card.title}
+                </Text>
+                <Text
+                  variant="headlineSmall"
+                  style={[styles.statValue, { color: isDark ? '#E2E8F0' : '#1A1A2E' }]}
+                >
+                  {card.value}
+                </Text>
+              </Surface>
+            ))}
+          </View>
+
+          {/* Recent Clients */}
+          <Surface
+            style={[styles.sectionCard, { backgroundColor: isDark ? '#1A1A2E' : '#FFFFFF' }]}
+            elevation={2}
+          >
+            <View style={styles.sectionHeader}>
+              <Text variant="titleMedium" style={{ color: isDark ? '#E2E8F0' : '#1A1A2E', fontWeight: '600' }}>
+                Clientes Recientes
+              </Text>
+              <MaterialCommunityIcons name="account-group" size={20} color={isDark ? '#94A3B8' : '#6B7280'} />
+            </View>
+            <Divider style={{ marginBottom: 8, backgroundColor: isDark ? '#2D2D44' : '#E2E8F0' }} />
+            {recentClients.length === 0 ? (
+              <Text style={{ color: isDark ? '#64748B' : '#94A3B8', textAlign: 'center', paddingVertical: 20 }}>
+                No hay clientes registrados
+              </Text>
+            ) : (
+              recentClients.map((client, index) => (
+                <View key={client.id}>
+                  <View style={styles.clientRow}>
+                    <View style={[styles.clientAvatar, { backgroundColor: '#0D737720' }]}>
+                      <Text style={{ color: '#0D7377', fontWeight: '700', fontSize: 16 }}>
+                        {client.name.charAt(0).toUpperCase()}
+                      </Text>
+                    </View>
+                    <View style={styles.clientInfo}>
+                      <Text
+                        variant="bodyMedium"
+                        style={{ color: isDark ? '#E2E8F0' : '#1A1A2E', fontWeight: '500' }}
+                      >
+                        {client.name}
+                      </Text>
+                      <Text variant="bodySmall" style={{ color: isDark ? '#64748B' : '#94A3B8' }}>
+                        DNI: {client.dni} • {client.email}
+                      </Text>
+                    </View>
+                    <View
+                      style={[
+                        styles.statusBadge,
+                        {
+                          backgroundColor:
+                            client.status === 'ACTIVE'
+                              ? isDark ? '#2ECC7120' : '#2ECC7115'
+                              : isDark ? '#CF667920' : '#CF667915',
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 11,
+                          fontWeight: '600',
+                          color: client.status === 'ACTIVE' ? '#2ECC71' : '#CF6679',
+                        }}
+                      >
+                        {client.status === 'ACTIVE' ? 'Activo' : 'Inactivo'}
+                      </Text>
+                    </View>
+                  </View>
+                  {index < recentClients.length - 1 && (
+                    <Divider style={{ marginVertical: 4, backgroundColor: isDark ? '#2D2D44' : '#F1F5F9' }} />
+                  )}
+                </View>
+              ))
+            )}
+          </Surface>
+        </ScrollView>
+      </SafeAreaView>
+    </ScreenBackground>
   );
 }
 
